@@ -7,9 +7,10 @@ A small script to keep those selfbots out of our Discord servers
 2. Add a bot to the application and remember the token secret
 3. Just download the 'preparebot.sh' on your server and run it. It will automatically install the bot.
 
-The script is working with: 
+The 'preparebot.sh' script is working with: 
 - Ubuntu
 - Debian
+The bot itself is compatible with all platforms that support [luvit](https://luvit.io/install.html)
 
 4. Start your bot using ``./luvit antispam.lua``
 

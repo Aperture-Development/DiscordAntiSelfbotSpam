@@ -43,27 +43,53 @@ function banMember(member)
     --[[
         Contact guild owner about the ban
     ]]
-    member.guild.owner.user:send({
-        embed = {
-            title = "A user got banned by me",
-            description = [[I have banned a user for looking like a SelfBot.]],
-            fields = {
-                {
-                    name = "Banned User Mention:",
-                    value = member.user.mentionString,
-                    inline = true
+    if member.guild.owner then
+        member.guild.owner.user:send({
+            embed = {
+                title = "A user got banned by me",
+                description = [[I have banned a user for looking like a SelfBot.]],
+                fields = {
+                    {
+                        name = "Banned User Mention:",
+                        value = member.user.mentionString,
+                        inline = true
+                    },
+                    {
+                        name = "Banned User Tag:",
+                        value = member.user.tag,
+                        inline = true
+                    }
                 },
-                {
-                    name = "Banned User Tag:",
-                    value = member.user.tag,
-                    inline = true
-                }
-            },
-            footer = {
-                text = member.guild.name
-            },
-            color = 0xFF0000 -- hex color code
-        }})
+                footer = {
+                    text = member.guild.name
+                },
+                color = 0xFF0000 -- hex color code
+            }})
+    elseif member.guild:get(member.guild.ownerId) then
+        member.guild:get(member.guild.ownerId).user:send({
+            embed = {
+                title = "A user got banned by me",
+                description = [[I have banned a user for looking like a SelfBot.]],
+                fields = {
+                    {
+                        name = "Banned User Mention:",
+                        value = member.user.mentionString,
+                        inline = true
+                    },
+                    {
+                        name = "Banned User Tag:",
+                        value = member.user.tag,
+                        inline = true
+                    }
+                },
+                footer = {
+                    text = member.guild.name
+                },
+                color = 0xFF0000 -- hex color code
+            }})
+    else
+        print("Could not contact owner of: "..member.guild.name.." - Error 404")
+    end
 
     --[[
         Actually ban the user

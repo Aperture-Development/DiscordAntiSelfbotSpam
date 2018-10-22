@@ -4,7 +4,72 @@ local client = discordia.Client()
 --[[
     Insert here your bot user token.
 ]]
-local botToken = "<INSERT BOT TOKEN HERE>"
+local botToken = "<INSERT BOT TOKEN>"
+
+--[[
+    List of not allowed nickname content
+    If you want to add something, just add a new line like you see
+    IMPORTANT: Don't forget the ',' after each line
+]]
+local nickBlackList = {
+    "#%d%d%d%d",
+    ".*%..*%/.*",
+    ".*tweet.*"
+}
+
+function banMember(member)
+    member.user:send({
+        embed = {
+            title = "You got banned!",
+            description = [[I am sorry but I had to ban you because you look like a SelfBot If you think that was a mistake, please contact the server owner.]],
+            fields = {
+                {
+                    name = "Guild Owner mention:",
+                    value = member.guild.owner.user.mentionString,
+                    inline = true
+                },
+                {
+                    name = "Guild Owner tag:",
+                    value = member.guild.owner.user.tag,
+                    inline = true
+                }
+            },
+            footer = {
+                text = member.guild.name
+            },
+            color = 0xFF0000 -- hex color code
+        }})
+
+    --[[
+        Contact guild owner about the ban
+    ]]
+    member.guild.owner.user:send({
+        embed = {
+            title = "A user got banned by me",
+            description = [[I have banned a user for looking like a SelfBot.]],
+            fields = {
+                {
+                    name = "Banned User Mention:",
+                    value = member.user.mentionString,
+                    inline = true
+                },
+                {
+                    name = "Banned User Tag:",
+                    value = member.user.tag,
+                    inline = true
+                }
+            },
+            footer = {
+                text = member.guild.name
+            },
+            color = 0xFF0000 -- hex color code
+        }})
+
+    --[[
+        Actually ban the user
+    ]]
+    member.guild:banUser(member.user, "Discord tag in username", 1)
+end
 
 client:on("ready", function() -- bot is ready
 	client:setGame("Type !dev for info")
@@ -12,121 +77,12 @@ end)
 
 client:on("memberJoin", function(member)
 
-    -- Check if the username contains a user tag
-    if string.match(member.user.username, '#%d%d%d%d') then
-        --[[
-            Contact user to inform that they can contact the server owner
-        ]]
-        member.user:send({
-            embed = {
-                title = "You got banned!",
-                description = [[I am sorry but I had to ban you because you had a Discord username in your username. If you think that was a mistake, please contact the server owner.]],
-                fields = {
-					{
-						name = "Guild Owner mention:",
-						value = member.guild.owner.user.mentionString,
-						inline = true
-					},
-					{
-						name = "Guild Owner tag:",
-						value = member.guild.owner.user.tag,
-						inline = true
-					}
-				},
-                footer = {
-                    text = member.guild.name
-                },
-                color = 0xFF0000 -- hex color code
-            }})
-
-        --[[
-            Contact guild owner about the ban
-        ]]
-        member.guild.owner.user:send({
-            embed = {
-                title = "A user got banned by me",
-                description = [[I have banned a user for having a link in their username.]],
-                fields = {
-                    {
-                        name = "Banned User Mention:",
-                        value = member.user.mentionString,
-                        inline = true
-                    },
-                    {
-                        name = "Banned User Tag:",
-                        value = member.user.tag,
-                        inline = true
-                    }
-                },
-                footer = {
-                    text = member.guild.name
-                },
-                color = 0xFF0000 -- hex color code
-            }})
-
-        --[[
-            Actually ban the user
-        ]]
-        member.guild:banUser(member.user, "Discord tag in username", 1)
-    
-    -- Check if the username contains a link
-    elseif string.match(member.user.username, '.*%..*%/.*') then
-
-        --[[
-            Contact user to inform that they can contact the server owner
-        ]]
-        member.user:send({
-            embed = {
-                title = "You got banned!",
-                description = [[I am sorry but I had to ban you because you had a link in your username. If you think that was a mistake, please contact the server owner.]],
-                fields = {
-					{
-						name = "Guild Owner Mention:",
-						value = member.guild.owner.user.mentionString,
-						inline = true
-					},
-					{
-						name = "Guild Owner Tag:",
-						value = member.guild.owner.user.tag,
-						inline = true
-					}
-				},
-                footer = {
-                    text = member.guild.name
-                },
-                color = 0xFF0000 -- hex color code
-            }})
-
-        --[[
-            Contact guild owner about the ban
-        ]]
-        member.guild.owner.user:send({
-            embed = {
-                title = "A user got banned by me",
-                description = [[I have banned a user for having a link in their username.]],
-                fields = {
-                    {
-                        name = "Banned User Mention:",
-                        value = member.user.mentionString,
-                        inline = true
-                    },
-                    {
-                        name = "Banned User Tag:",
-                        value = member.user.tag,
-                        inline = true
-                    }
-                },
-                footer = {
-                    text = member.guild.name
-                },
-                color = 0xFF0000 -- hex color code
-            }})
-
-        --[[
-            Actually ban the user
-        ]]
-        member.guild:banUser(member.user, "Link in username", 1)
-    end
+    for k,v in pairs(nickBlackList) do
+        if string.match(member.user.username, v) then 
+            banMember(member)
+            break
+        end
+    end    
 end)
 
 --[[

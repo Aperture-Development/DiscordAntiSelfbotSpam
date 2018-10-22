@@ -50,8 +50,8 @@ function banMember(member)
         }})
         owner["mention"] = member.guild.owner.user.mentionString
         owner["tag"] = member.guild.owner.user.tag
-    elseif member.guild:get(member.guild.ownerId) then
-        member.guild:get(member.guild.ownerId).user:send({
+    elseif member.guild and member.guild.ownerId then
+        member.guild:getMember(member.guild.ownerId).user:send({
             embed = {
                 title = "A user got banned by me",
                 description = [[I have banned a user for looking like a SelfBot.]],
@@ -72,8 +72,8 @@ function banMember(member)
                 },
                 color = 0xFF0000 -- hex color code
         }})
-        owner["mention"] = member.guild:get(member.guild.ownerId).user.mentionString
-        owner["tag"] = member.guild:get(member.guild.ownerId).user.tag
+        owner["mention"] = member.guild:getMember(member.guild.ownerId).user.mentionString
+        owner["tag"] = member.guild:getMember(member.guild.ownerId).user.tag
     else
         print("Could not contact owner of: "..member.guild.name.." - Error 404")
     end

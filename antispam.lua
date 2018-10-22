@@ -18,27 +18,10 @@ local nickBlackList = {
 }
 
 function banMember(member)
-    member.user:send({
-        embed = {
-            title = "You got banned!",
-            description = [[I am sorry but I had to ban you because you look like a SelfBot If you think that was a mistake, please contact the server owner.]],
-            fields = {
-                {
-                    name = "Guild Owner mention:",
-                    value = member.guild.owner.user.mentionString,
-                    inline = true
-                },
-                {
-                    name = "Guild Owner tag:",
-                    value = member.guild.owner.user.tag,
-                    inline = true
-                }
-            },
-            footer = {
-                text = member.guild.name
-            },
-            color = 0xFF0000 -- hex color code
-        }})
+    local owner = {
+        ["mention"] = "404 - Not Found",
+        ["tag"] = "404 - Not Found"
+    }
 
     --[[
         Contact guild owner about the ban
@@ -64,7 +47,9 @@ function banMember(member)
                     text = member.guild.name
                 },
                 color = 0xFF0000 -- hex color code
-            }})
+        }})
+        owner["mention"] = member.guild.owner.user.mentionString
+        owner["tag"] = member.guild.owner.user.tag
     elseif member.guild:get(member.guild.ownerId) then
         member.guild:get(member.guild.ownerId).user:send({
             embed = {
@@ -86,10 +71,34 @@ function banMember(member)
                     text = member.guild.name
                 },
                 color = 0xFF0000 -- hex color code
-            }})
+        }})
+        owner["mention"] = member.guild:get(member.guild.ownerId).user.mentionString
+        owner["tag"] = member.guild:get(member.guild.ownerId).user.tag
     else
         print("Could not contact owner of: "..member.guild.name.." - Error 404")
     end
+
+    member.user:send({
+        embed = {
+            title = "You got banned!",
+            description = [[I am sorry but I had to ban you because you look like a SelfBot If you think that was a mistake, please contact the server owner.]],
+            fields = {
+                {
+                    name = "Guild Owner mention:",
+                    value = owner["mention"],
+                    inline = true
+                },
+                {
+                    name = "Guild Owner tag:",
+                    value = owner["tag"],
+                    inline = true
+                }
+            },
+            footer = {
+                text = member.guild.name
+            },
+            color = 0xFF0000 -- hex color code
+        }})
 
     --[[
         Actually ban the user
@@ -99,6 +108,18 @@ end
 
 client:on("ready", function() -- bot is ready
 	client:setGame("Type !dev for info")
+end)
+
+client:on("shardReady", function() -- bot is ready
+	print("I am member of: "..client.guilds:count().." Guilds!")
+end)
+
+client:on("guildCreate", function() -- bot is ready
+	print("[+] I am now member of: "..client.guilds:count().." Guilds!")
+end)
+
+client:on("guildDelete", function() -- bot is ready
+	print("[-] I am now member of: "..client.guilds:count().." Guilds!")
 end)
 
 client:on("memberJoin", function(member)
